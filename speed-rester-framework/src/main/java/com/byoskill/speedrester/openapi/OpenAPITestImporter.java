@@ -263,14 +263,22 @@ public class OpenAPITestImporter {
     }
 
     private void buildingTestForPathResource() {
+        if (resourcePaths == null) {
+            log.error("No resource path in the swagger");
+            return;
+        }
         this.resourcePaths.forEach((path, spec) -> {
             final RestScenario       restScenario       = new RestScenario();
             final Optional<JsonNode> resourcePathMethod = this.getResourcePathMethod(spec);
             final HttpMethodEnum     methodName         = this.getMethodName(spec);
             final JsonNode           endpointSpec       = resourcePathMethod.get();
             final String             tagName            = this.getFirstTagOf(endpointSpec);
-            final String             operationId        = endpointSpec.get("operationId").textValue();
-            final JsonNode           parameters         = endpointSpec.get("parameters");
+            if (endpointSpec.get("operationId") == null) {
+                log.error("Invalid operation, missing operationId :" + endpointSpec);
+                return ;
+            }
+            final String   operationId = endpointSpec.get("operationId").textValue();
+            final JsonNode parameters  = endpointSpec.get("parameters");
 
             final OpenAPIRestPath restPath = new OpenAPIRestPath(path);
 

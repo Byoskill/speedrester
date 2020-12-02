@@ -1,0 +1,13 @@
+{
+  "baseURL" : "https://petstore3.swagger.io/api/v3",
+  "params" : {
+    "password" : "exampleString",
+    "petId" : "1",
+    "orderId" : "1",
+    "additionalMetadata" : "exampleString",
+    "username" : "exampleString",
+    "status" : "exampleString",
+    "tags" : "array"
+  },
+  "defaultTimeOut" : 5000
+}
