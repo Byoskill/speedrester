@@ -1,0 +1,121 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "AWeber API",
+    "description": "We are constantly working to improve this documentation. If you have\nfeedback and questions, please contact the AWeber API team at\napi@aweber.com.\n\nThe AWeber API is a REST API that uses the OAuth 2.0 authentication model. We also offer webhooks.\n\nPlease see the below resources for further information:\n- <a href=\"https://labs.aweber.com/docs/tos\" target=\"_blank\">Terms of Service</a>\n- <a href=\"https://help.aweber.com/hc/en-us/articles/204031776\" target=\"_blank\">Showcasing an Integration</a>\n- <a href=\"https://help.aweber.com/hc/en-us/sections/360000617213-API\" target=\"_blank\">Knowledge Base</a>\n- <a href=\"https://status.aweber.com\" target=\"_blank\">API Status Page</a>\n",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "/1.0"
+    }
+  ],
+  "tags": {
+    "$ref": "_tags.yaml"
+  },
+  "x-tagGroups": [
+    {
+      "name": "Getting Started",
+      "tags": [
+        "Getting Started"
+      ]
+    },
+    {
+      "name": "Authentication",
+      "tags": [
+        "Authentication Overview",
+        "OAuth 2.0 Examples",
+        "OAuth 2.0 Traces",
+        "OAuth 2.0 Reference",
+        "OAuth 1.0a Reference"
+      ]
+    },
+    {
+      "name": "API Reference",
+      "tags": [
+        "Accounts",
+        "Broadcasts",
+        "Campaigns",
+        "Custom Fields",
+        "Integrations",
+        "Landing Pages",
+        "Lists",
+        "Segments",
+        "Subscribers",
+        "Webforms"
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "tags": [
+        "Webhooks"
+      ]
+    },
+    {
+      "name": "Code Samples",
+      "tags": [
+        "Introduction",
+        "Find a List and Get Tags",
+        "Manage a Subscriber",
+        "Manage Custom Fields",
+        "Find Subscribers Across Lists",
+        "Move Subscriber to Another List",
+        "Create and Schedule a Broadcast",
+        "Get Sent Broadcast Details",
+        "Get Broadcast Statistics",
+        "Get Subscribers Who Opened or Clicked a Broadcast",
+        "Get Clicks by Link for a Campaign",
+        "Get Webforms Detail",
+        "Get Integrations List",
+        "Get Segments",
+        "Get Landing Pages"
+      ]
+    },
+    {
+      "name": "Miscellaneous",
+      "tags": [
+        "Developer Changelog",
+        "FAQ",
+        "Troubleshooting"
+      ]
+    }
+  ],
+  "paths": {
+    "$ref": "_paths.yaml"
+  },
+  "components": {
+    "parameters": {
+      "$ref": "_parameters.yaml"
+    },
+    "responses": {
+      "$ref": "_responses.yaml"
+    },
+    "schemas": {
+      "$ref": "_definitions.yaml"
+    },
+    "securitySchemes": {
+      "OAuth 2.0": {
+        "description": "The following endpoints and scopes are used to authenticate.\n",
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.aweber.com/oauth2/authorize",
+            "tokenUrl": "https://auth.aweber.com/oauth2/token",
+            "refreshUrl": "https://auth.aweber.com/oauth2/token",
+            "scopes": {
+              "account.read": "<br>\nAccess account information and associated integrations. <br>\n<b>Required for the following endpoints:</b> get accounts, get account, get integrations, get integration\n",
+              "landing-page.read": "<br>\nRetrieve landing pages <br>\n<b>Required for the following endpoints:</b> get landing pages, get landing page\n",
+              "list.read": "<br>\nRetrieve lists, custom fields, tags, and sign up forms <br>\n<b>Required for the following endpoints:</b> get list, get lists, find lists, get tags for list, get custom fields, get custom field, get webforms for list, get split tests for list, get split test components, get split test component, get webforms for account, get split tests for account\n",
+              "list.write": "<br>\nCreate, edit, and delete custom fields <br>\n<b>Required for the following endpoints:</b> add custom field, update custom field, delete custom field\n",
+              "subscriber.read": "<br>\nRetrieve subscribers and their activity <br>\n<b>Required for the following endpoints:</b> get subscribers, get subscriber, get subscriber activity, get subscribers for message\n",
+              "subscriber.write": "<br>\nCreated, edit, delete, and move subscribers <br>\n<b>Required for the following endpoints:</b> add subscriber, move subscriber, update subscriber, delete subscriber\n",
+              "subscriber.read-extended": "<br>\nRetrieve subscriber PII such as name, email, IP address, etc. <br>\n<b>Required for the following endpoints:</b> find subscribers for account, find subscribers for list required to return subscriber fields that are considered PII and normally omitted from responses (currently: email, ip_address, miscellaneous notes, and name)\n",
+              "email.read": "<br>\nRetrieve email activity related to broadcasts and follow-ups <br>\n<b>Required for the following endpoints:</b> get messages, get message, get broadcasts, get broadcast, get message opens, get message open, get message tracked events, get message tracked event, get total broadcasts, get campaigns, get campaign, find campaigns, get links, get link, get clicks, get click, get broadcast statistics, get broadcast statistic\n",
+              "email.write": "<br>\nCreate and send email broadcasts <br>\n<b>Required for the following endpoints:</b> create broadcast, update broadcast, delete broadcast, cancel broadcast, schedule broadcast\n"
+            }
+          }
+        }
+      }
+    }
+  }
+}

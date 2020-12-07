@@ -15,6 +15,7 @@ public class ServerConfiguration {
     private           String              baseURL;
     private           Map<String, String> params              = new HashMap<>();
     private           int                 defaultTimeOut      = 5000;
+    private           boolean             ignoreFailures      = false;
     @JsonIgnore
     private transient PayloadFileResolver payloadFileResolver = new ClassPathPayloadFileResolver();
     private           boolean             pingEnabled         = true;

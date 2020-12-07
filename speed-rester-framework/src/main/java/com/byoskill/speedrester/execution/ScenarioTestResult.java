@@ -9,10 +9,11 @@ import java.util.Map;
 @Data
 @Slf4j
 public class ScenarioTestResult {
-    private Throwable           errorReason;
-    private boolean             success = true;
-    private Map<String, String> errorMessages = new HashMap<>();
+    public static ScenarioTestResult SUCCESS = new ScenarioTestResult();
 
+    private Throwable           errorReason;
+    private boolean             success       = true;
+    private Map<String, String> errorMessages = new HashMap<>();
 
     public static ScenarioTestResult fail(final Throwable e) {
         final ScenarioTestResult scenarioTestResult = new ScenarioTestResult();
@@ -25,7 +26,7 @@ public class ScenarioTestResult {
         try {
             evaluation.run();
             this.errorMessages.put(message, "SUCCESS");
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             log.error("Assertion {} as failed", message, t);
             this.errorMessages.put(message, "FAILURE");
             setSuccess(false);

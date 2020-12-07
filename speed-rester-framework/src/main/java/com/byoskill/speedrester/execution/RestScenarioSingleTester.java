@@ -51,7 +51,7 @@ public class RestScenarioSingleTester {
     private ScenarioTestResult proceedResponse(final CloseableHttpResponse response) throws IOException {
         final RestExpectations expectations     = this.restScenario.getExpectations();
         final AssertionChecker assertionChecker = new AssertionChecker(this.restScenario, expectations, response);
-        return assertionChecker.check();
+        return serverConfiguration.isIgnoreFailures() ? ScenarioTestResult.SUCCESS : assertionChecker.check();
 
 
     }

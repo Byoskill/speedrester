@@ -16,6 +16,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * This class is handling the conversion of a SWAGGER/Open API into a set of scripts and entities to write REST integration tests.
+ * To convert an OpenAPI document you need an URL and a output folder by calling the generateTests method.
+ */
 @Slf4j
 public class OpenAPITestImporter {
 
@@ -23,6 +27,7 @@ public class OpenAPITestImporter {
     public static final String                       TEST_DEFAULT_FOLDER       = "tests";
     public static final String                       ENTITIES                  = "entities";
     public static final String                       SERVER_CONFIGURATION_JSON = "server.configuration.json";
+    public static final String                       COMPONENTS_SCHEMAS        = "#/components/schemas/";
     private final       Map<String, JsonNode>        resourcePaths             = new HashMap<>();
     private final       Map<String, File>            tagFolder                 = new HashMap<>();
     private final       Map<String, RestTypeMapping> restTypeMapping           = new LinkedHashMap<>();
@@ -68,6 +73,13 @@ public class OpenAPITestImporter {
         this.overrideTests = overrideTests;
     }
 
+    /**
+     * Entry point to generate the tests from an OPEN API url.
+     *
+     * @param openAPIUrl   the open api url
+     * @param outputFolder the output folder
+     * @throws IOException the io exception
+     */
     public void generateTests(final URL openAPIUrl, final File outputFolder) throws IOException {
 
         this.openAPI             = this.fetchOpenAPI(openAPIUrl);
@@ -130,11 +142,13 @@ public class OpenAPITestImporter {
             final RestTypeMapping restTypeMapping = new RestTypeMapping();
             restTypeMapping.setTypeName(typeName);
 
-            properties.fields().forEachRemaining(
-                    (entry -> {
-                        restTypeMapping.addField(this.parseProperty(entry));
-                    })
-            );
+            if (properties != null && properties.fields() != null) {
+                properties.fields().forEachRemaining(
+                        (entry -> {
+                            restTypeMapping.addField(this.parseProperty(entry));
+                        })
+                );
+            }
 
 
             this.restTypeMapping.put(typeName, restTypeMapping);
@@ -249,14 +263,22 @@ public class OpenAPITestImporter {
     }
 
     private void buildingTestForPathResource() {
+        if (resourcePaths == null) {
+            log.error("No resource path in the swagger");
+            return;
+        }
         this.resourcePaths.forEach((path, spec) -> {
             final RestScenario       restScenario       = new RestScenario();
             final Optional<JsonNode> resourcePathMethod = this.getResourcePathMethod(spec);
             final HttpMethodEnum     methodName         = this.getMethodName(spec);
             final JsonNode           endpointSpec       = resourcePathMethod.get();
             final String             tagName            = this.getFirstTagOf(endpointSpec);
-            final String             operationId        = endpointSpec.get("operationId").textValue();
-            final JsonNode           parameters         = endpointSpec.get("parameters");
+            if (endpointSpec.get("operationId") == null) {
+                log.error("Invalid operation, missing operationId :" + endpointSpec);
+                return ;
+            }
+            final String   operationId = endpointSpec.get("operationId").textValue();
+            final JsonNode parameters  = endpointSpec.get("parameters");
 
             final OpenAPIRestPath restPath = new OpenAPIRestPath(path);
 
@@ -313,7 +335,13 @@ public class OpenAPITestImporter {
     }
 
     private String convertParamType(final JsonNode node) {
-        final String type = node.get("schema").get("type").textValue();
+        JsonNode schema = node.get("schema");
+        if (schema == null || schema.get("type") == null) {
+            String $ref = schema.get("$ref").asText();
+            if ($ref != null && $ref.startsWith(COMPONENTS_SCHEMAS)) return $ref.substring(COMPONENTS_SCHEMAS.length());
+            return $ref;
+        }
+        final String type = schema.get("type").textValue();
         switch (type){
             case "string":
                 return "exampleString";
@@ -348,7 +376,7 @@ public class OpenAPITestImporter {
         final String[] codeNames = this.getCodeNames();
         return findFirstNode(rpath, codeNames);
     }
-    
+
     private String[] getCodeNames() {
         return Arrays.stream(HttpMethodEnum.values())
                 .map(code -> code.name().toLowerCase())
