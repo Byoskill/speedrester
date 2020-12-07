@@ -17,6 +17,7 @@ public class ServerConfiguration {
     private           int                 defaultTimeOut      = 5000;
     @JsonIgnore
     private transient PayloadFileResolver payloadFileResolver = new ClassPathPayloadFileResolver();
+    private           boolean             pingEnabled         = true;
 
     public static ServerConfiguration load(final InputStream resourceAsStream) throws IOException {
         return JsonUtils.INSTANCE.readValue(resourceAsStream, ServerConfiguration.class);
@@ -36,5 +37,9 @@ public class ServerConfiguration {
 
     public void putParam(final String variableName, final String typeExampleValue) {
         this.params.put(variableName, typeExampleValue);
+    }
+
+    public boolean isPingEnabled() {
+        return pingEnabled;
     }
 }

@@ -1,9 +1,11 @@
 package com.byoskill.speedrester.model;
 
 import com.byoskill.speedrester.utils.JsonUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.io.File;
@@ -13,8 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class RestScenario extends RestCall {
+    @JsonIgnore
+    private String              fileName;
     private boolean             disabled;
     private String              testName;
     private List<RestCallStep>  sequence;
