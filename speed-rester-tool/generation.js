@@ -51,7 +51,7 @@ exports.default = class Generation {
         // Options to generate the code
         this.genOpts = {
             testFolder: this.context.path.join(this.output, '__tests__'),
-            entitiesFolder: this.context.path.join(this.output, 'entities'),
+            entitiesFolder: this.context.path.join(this.output, 'entities'),            
             libFolder: this.context.path.join(this.output, 'lib')
         };
 
@@ -271,6 +271,7 @@ exports.default = class Generation {
 
             const responseType = this.getEndpointResponseType(endpointInfo);
             const hasBody = ['array', 'object', '$ref'].some(p => p === responseType);
+            const isJson = endpointInfo.produces.length > 0 && (endpointInfo.produces[0] === '*/*' || endpointInfo.produces[0] === ('application/json'));
 
             const pathParams = {};
             const queryParams = {};
@@ -291,8 +292,12 @@ exports.default = class Generation {
                 endpointInfo,
                 url: pathValue,
                 pathParams,
-                hasBody
+                hasBody,
+                isJson, 
+                consumes : endpointInfo.consumes && endpointInfo.consumes[0] || null,
+                produces : endpointInfo.produces && endpointInfo.produces[0] || null
             };
+
             this.generateAndWrite(context, 'nonRegressionTest.js', `__tests__/${controller}/${operationId}.js`);
         }
 

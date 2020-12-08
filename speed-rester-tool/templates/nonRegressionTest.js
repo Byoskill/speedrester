@@ -23,17 +23,16 @@ describe('{{{controller}}}', () => {
 
         };
         endpointConfig.url = {{{literal url}}};
+        endpointConfig.produces = {{{literal produces}}};
+        endpointConfig.consumes = {{{literal consumes}}};
 
         return client
             .execute(endpointConfig)
             .then((response) => {
                 response.hasStatus(200);
                 {{#if hasBody}}
-                response.hasBody()
+                response.hasBody("{{{controller}}}/{{{operationId}}}-response.json", {{{isJson}}});
                 {{/if}}
-                
-                // OPTIONAL response.hasObjectBody();
-                //OPTIONAL response.jsonLike(response);
             })
             .catch((err) => {
                 console.log(err);
