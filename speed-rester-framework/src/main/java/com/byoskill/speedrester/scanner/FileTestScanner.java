@@ -21,6 +21,7 @@ public class FileTestScanner implements ResourceTestScanner {
      */
     public FileTestScanner(final Path testFolder) {
 
+
         this.testFolder = testFolder;
     }
 

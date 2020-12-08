@@ -1,0 +1,6 @@
+{{#if field.entityCollection}}
+entity.set{{capitalize field.name}}(this.{{javaTypeToBeanName field.relatedJpaEntity}}converter.toEntities(dto.get{{capitalize field.name}}() ));
+{{/if}}
+{{#unless field.entityCollection}}
+entity.set{{capitalize field.name}}(this.{{javaTypeToBeanName field.relatedJpaEntity}}converter.toEntity(dto.get{{capitalize field.name}}() ));
+{{/unless}}
