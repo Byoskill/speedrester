@@ -14,6 +14,8 @@ class EndpointConfig {
         this.computedUrl = '';
         this.headers = {};
         this.method = 'get';
+        this.produces = null;
+        this.consumes = null;		
     }
 
     buildUrl() {
@@ -32,11 +34,22 @@ class EndpointConfig {
     }
 
     build() {
+
+        const customHeaders = {};
+
+        if ( this.produces ) {
+            customHeaders['Accept'] = this.produces;
+        }
+
+        if ( this.consumes ) {
+            customHeaders['Content-Type'] = this.consumes;
+        }
+
         return {
             method: this.method,
             url: this.buildUrl(),
             params: this.queryParams,
-            headers: { ...serverConfig.headers(), ...this.headers }
+            headers: { ...serverConfig.headers(), ...this.headers, ...customHeaders }
         };
     }
 }

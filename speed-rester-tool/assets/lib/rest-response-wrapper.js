@@ -52,7 +52,6 @@ class TestResponseWrapper {
 
         } else {
             const payload = JSON.stringify(this.response.data, null, 2);
-            console.log(`response ${payload}`);
             if( isJson ) {
                 fs.writeFileSync(payloadPath, payload);
             } else {

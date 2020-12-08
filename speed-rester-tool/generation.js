@@ -107,9 +107,18 @@ exports.default = class Generation {
                 // 
                 payload[propKey] = {};
             } else if ( props.type === 'array') {
-                payload[propKey] = [];
+                if (props.enum) {
+                    this.log.error('enum '+ props.enum);
+                    payload[propKey] = [props['enum'][0]];
+                } else {
+                    payload[propKey] = [];
+                }
             } else {
-                payload[propKey] = this.getDefaultValue(props.type);
+                if ( props.enum) {
+                    return props.enum[Math.round(Math.random()* props.enum.length)];
+                } else {
+                    payload[propKey] = this.getDefaultValue(props.type);
+                }
             }            
         }
         return payload;
@@ -292,6 +301,7 @@ exports.default = class Generation {
                 endpointInfo,
                 url: pathValue,
                 pathParams,
+                queryParams,
                 hasBody,
                 isJson, 
                 consumes : endpointInfo.consumes && endpointInfo.consumes[0] || null,
