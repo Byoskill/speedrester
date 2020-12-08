@@ -117,7 +117,7 @@ exports.default = class Generation {
                 if ( props.enum) {
                     return props.enum[Math.round(Math.random()* props.enum.length)];
                 } else {
-                    payload[propKey] = this.getDefaultValue(props.type);
+                    payload[propKey] = this.getDefaultValue(props.type, props.format);
                 }
             }            
         }
@@ -170,14 +170,27 @@ exports.default = class Generation {
 
     guessDefaultValue(v) {
         if ( v.schema && v.schema.value) return v.schema.value;
-        if ( !v.required) return null;
+        if ( !v.required) return null;        
+        if (v.schema && v.schema.$ref) {
+            //"schema": { "$ref": "#/definitions/BaseObject" }
+            this.log.info('Found ref ', v.$ref);
+            return v.schema.$ref;
+        }
+        if ( v.enum) {            
+            return v.enum[Math.round(Math.random()* v.enum.length)];
+        }
         const propType = v.type;
-        return this.getDefaultValue(propType);
+        return this.getDefaultValue(propType, v.format);
     }
 
-    getDefaultValue(propType) {
+    getDefaultValue(propType, format) {
         if ( propType === 'boolean') return false;
-        if ( propType === 'string') return '';
+        if ( propType === 'string') {
+            if ( format === 'date-time') {
+                return new Date().toJSON();
+            }            
+            return '';
+        }
         if ( propType === 'integer') return 0;
         if ( propType === 'long') return 0;
         if ( propType === 'array') return [];
@@ -275,12 +288,17 @@ exports.default = class Generation {
             const method = this.getEndpointMethod(endpoint);
             const endpointInfo = this.getEndpointInfo(endpoint);
             const controller = endpointInfo.tags[0];
-            const pathUrlAsName = pathValue.substring(1).replace(new RegExp('\\{\\}\\/', 'g'), '').replace(/\//g, '_');
-            const operationId = controller.operationId || pathUrlAsName.length ==0 ? 'root' : pathUrlAsName; 
+            const pathUrlAsName = pathValue.substring(1);
+
+            let operationId = endpointInfo.operationId || (pathUrlAsName.length ==0 ? 'root' : pathUrlAsName); 
+            operationId = operationId.replace(new RegExp('\\{\\}\\/', 'g'), '').replace(/\//g, '_');
+            
 
             const responseType = this.getEndpointResponseType(endpointInfo);
             const hasBody = ['array', 'object', '$ref'].some(p => p === responseType);
             const isJson = endpointInfo.produces.length > 0 && (endpointInfo.produces[0] === '*/*' || endpointInfo.produces[0] === ('application/json'));
+
+            let data =  null;
 
             const pathParams = {};
             const queryParams = {};
@@ -290,6 +308,14 @@ exports.default = class Generation {
                         pathParams[param.name] = `defaultParams.pathParams.${param.name}`;
                     } else if (param.in === 'query') {
                         queryParams[param.name]= `defaultParams.queryParams.${param.name}`;
+                    } else if (param.in === 'body') {
+                        if (param.schema && param.schema.$ref) {
+                            data = param.schema.$ref.replace(/#\/definitions\//g, '');
+                        } else if (param.schema) {                            
+                            data = this.guessDefaultValue(param.schema);
+                        } else {
+                            data = 'unknown';
+                        }                        
                     }
                 }
             }
@@ -304,6 +330,7 @@ exports.default = class Generation {
                 queryParams,
                 hasBody,
                 isJson, 
+                data,
                 consumes : endpointInfo.consumes && endpointInfo.consumes[0] || null,
                 produces : endpointInfo.produces && endpointInfo.produces[0] || null
             };

@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 var chai = require('chai');
 var like = require('chai-like');
+const logger = require('./logger').logger;
 chai.use(require('chai-json-pattern').default);
 chai.use(require('chai-json'));
 chai.use(like);
@@ -30,7 +31,10 @@ class TestResponseWrapper {
     }
 
     hasStatus(statusCode) {
-        assert(this.response.status === statusCode, `Status is not ${statusCode}.`);
+        if (this.response.status >= 300) {
+            logger.error('Error : ${JSON.stringify(this.response.data)}');
+        }
+        assert(this.response.status === statusCode, `Status is not ${statusCode}.`);	
         return this;
     }
     hasObjectBody() {

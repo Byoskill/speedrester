@@ -6,10 +6,9 @@ const assert = chai.assert; // Using Assert style
 // Entities
 const defaultParams = require('../../entities/default-params.json');
 
-//Optional const response = require('../../entities/article-controller/getAllComboBoxArticlegetAllComboBoxArticle_response.json');
-
 const client = new Client();
 describe('{{{controller}}}', () => {
+
     /**
      * Test of the endpoint {{{method}}} {{{url}}}
      * for the controller {{{controller}}}
@@ -30,6 +29,9 @@ describe('{{{controller}}}', () => {
         endpointConfig.url = {{{literal url}}};
         endpointConfig.produces = {{{literal produces}}};
         endpointConfig.consumes = {{{literal consumes}}};
+        {{#if data}}
+        endpointConfig.data = require("../../entities/objects/{{{data}}}.json");
+        {{/if}}
 
         return client
             .execute(endpointConfig)
