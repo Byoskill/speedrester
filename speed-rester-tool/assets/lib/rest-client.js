@@ -40,9 +40,9 @@ class Client {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
 
-            logger.error(`axios::error::data ${error.response.data}`);
-            logger.error(`axios::error::status ${error.response.status}`);
-            logger.error(`axios::error::headers ${error.response.headers}`);
+            logger.error(`axios::error::data ${JSON.stringify(error.response.data, null, 2)}`);
+            logger.error(`axios::error::status ${JSON.stringify(error.response.status, null, 2)}`);
+            logger.error(`axios::error::headers ${JSON.stringify(error.response.headers, null, 2)}`);
         } else if (error.request) {
             // The request was made but no response was received
             // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
