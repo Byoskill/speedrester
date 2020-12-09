@@ -32,7 +32,7 @@ class TestResponseWrapper {
 
     hasStatus(statusCode) {
         if (this.response.status >= 300) {
-            logger.error('Error : ${JSON.stringify(this.response.data)}');
+            logger.error('Error : ${JSON.stringify(this.response.data, null, 2)}');
         }
         assert(this.response.status === statusCode, `Status is not ${statusCode}.`);	
         return this;

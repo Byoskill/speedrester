@@ -4,7 +4,6 @@ const ServerConfiguration = require('./config');
 const TestResponseWrapper = require('./rest-response-wrapper');
 const EndpointConfig = require('./endpoint-config');
 
-
 const serverConfig = new ServerConfiguration();
 
 /**
@@ -37,8 +36,24 @@ class Client {
     }
 
     handleError(error) {
-        logger.error(`axios::error ${error}`);
-        //console.log(error);
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+
+            logger.error(`axios::error::data ${error.response.data}`);
+            logger.error(`axios::error::status ${error.response.status}`);
+            logger.error(`axios::error::headers ${error.response.headers}`);
+        } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            logger.error(`axios::error::request ${JSON.stringify(error.request, null, 2)}`);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            logger.error(`axios::error::message ${JSON.stringify(error.message, null, 2)}`);
+        }
+        console.log(error.config);
+
         return new TestResponseWrapper(error);
     }
 }

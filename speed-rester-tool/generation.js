@@ -58,6 +58,7 @@ exports.default = class Generation {
         this.application = {
             author: 'Sylvain Leroy'
         };
+        this.dictionnary = this.context.requires('./dictionnary.json');
     }
 
     generate() {
@@ -76,7 +77,7 @@ exports.default = class Generation {
         this.mkDir(this.genOpts.entitiesFolder);
         this.mkDir(this.genOpts.libFolder);
 
-        // Generate the default config for the REST Client.
+        // Generate the default config for the REST Client and a dictionnary
         this.generateDefaultParams();
 
         // Generate the entities
@@ -130,16 +131,24 @@ exports.default = class Generation {
         const queryParamMap = new Map();
         const urlParamMap = new Map();
 
+        const dictionnary = {};
+
         // Build param index.
         for (const pathValue in paths) {
             const endpoint = paths[pathValue];
             const endpointInfo = this.getEndpointInfo(endpoint);
             if (!endpointInfo.parameters) continue ;
             for (const param of endpointInfo.parameters) {
+                if (param.name && param.name.indexOf('.') !== -1) {
+                    this.log.error(`Invalid parameter name in ${JSON.stringify(param, null, 2)}`); 
+                    continue;
+                }
                 if (param.in === 'path') {
                     urlParamMap.set(param.name, param);
+                    dictionnary[param.name] = this.guessDefaultValue(param);
                 } else if (param.in === 'query') {
                     queryParamMap.set(param.name, param);
+                    dictionnary[param.name] = this.guessDefaultValue(param);
                 }
             }
         }
@@ -153,17 +162,18 @@ exports.default = class Generation {
 
 
         queryParamMapAsc.forEach((v, k) => {
-            defaultParams.queryParams[k] = this.guessDefaultValue(v);
+            defaultParams.queryParams[k] = this.dictionnary[k] || this.guessDefaultValue(v);
             defaultParamTypes.queryParams[k] = v;
         });
 
         urlParamMapAsc.forEach((v, k) => {
-            defaultParams.pathParams[k] = this.guessDefaultValue(v);
+            defaultParams.pathParams[k] = this.dictionnary[k] || this.guessDefaultValue(v);
             defaultParamTypes.pathParams[k] = v;
         });
         
         this.writeFile(this.computePath('entities/default-params.json'), JSON.stringify(defaultParams, null, 2));
         this.writeFile(this.computePath('entities/default-params-types.json'), JSON.stringify(defaultParamTypes, null, 2));
+        this.writeFile(this.computePath('default-dictionnary.json'), JSON.stringify(dictionnary, null, 2));
 
 
     }
@@ -304,6 +314,10 @@ exports.default = class Generation {
             const queryParams = {};
             if (endpointInfo.parameters) {
                 for (const param of endpointInfo.parameters) {
+                    if (param.name && param.name.indexOf('.') !== -1) {
+                        this.log.error(`Invalid parameter name in ${JSON.stringify(param, null, 2)}`); 
+                        continue;
+                    }
                     if (param.in === 'path') {
                         pathParams[param.name] = `defaultParams.pathParams.${param.name}`;
                     } else if (param.in === 'query') {
@@ -312,7 +326,7 @@ exports.default = class Generation {
                         if (param.schema && param.schema.$ref) {
                             data = param.schema.$ref.replace(/#\/definitions\//g, '');
                         } else if (param.schema) {                            
-                            data = this.guessDefaultValue(param.schema);
+                            data = this.dictionnary[param.name] || this.guessDefaultValue(param.schema);
                         } else {
                             data = 'unknown';
                         }                        

@@ -18,12 +18,14 @@ describe('{{{controller}}}', () => {
         endpointConfig.method = {{{literal method}}};
 
         endpointConfig.pathParams = {
-            {{#each pathParams}} {{{@key}}}: {{{this}}}, {{/each}}
+            {{#each pathParams}} {{{@key}}}: {{{this}}}, 
+            {{/each}}
 
         };
 
         endpointConfig.queryParams = {
-            {{#each queryParams}} {{{@key}}}: {{{this}}}, {{/each}}
+            {{#each queryParams}} {{{@key}}}: {{{this}}},
+             {{/each}}
 
         };
         endpointConfig.url = {{{literal url}}};
